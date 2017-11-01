@@ -1,5 +1,19 @@
 import numpy as np
 
+def activation(x):
+    """
+    Returns the sigmoid activation function for all values in x
+    """
+    return 1.0 / 1 + np.exp(-x)
+
+def d_activation(x):
+    """
+    Implements the derivative of the sigmoid activation function
+    for all values of x
+    """
+    a = activation(x)
+    return a * (1 - a)
+
 class NeuralNet:
     """
     Represents a feed forward, fully connected neural network that can be trained using
@@ -27,16 +41,16 @@ class NeuralNet:
         array self.weights. The dimensions are set up so that you can calculate the
         next layer's activation as:
         ```
-        activation(get_layer_weights(layer) * last_layer_activation_vector)
+        last_layer_activation_vector * activation(get_layer_weights(layer))
         ```
-        Where last_layer_activation_vector is a column (aka vertical) vector.
+        Where last_layer_activation_vector is a row (aka horizontal) vector.
         """
-        dims = (self.sizes[layer+1], self.sizes[layer])
+        dims = (self.sizes[layer], self.sizes[layer+1])
         size = dims[0] * dims[1]
-        next_pairs = ((self.sizes[i], self.sizes[i+1]) for i in self.layers - 1)
+        next_pairs = ((self.sizes[i], self.sizes[i+1]) for i in range(layer))
         offset = sum(pair[0] * pair[1] for pair in next_pairs)
 
-        weight_subset = self.weights[offset:offset+size]
+        weight_subset = self.weights[offset:offset+size].copy()
         weight_subset.resize(dims)
 
         return np.matrix(weight_subset)
@@ -48,10 +62,19 @@ class NeuralNet:
         pass
 
     def get_weights(self):
-        pass
+        return self.weights
 
     def predict(self, input_x):
-        pass
+        """
+        Takes in a given sample (input_x) and calculates the predicted values of
+        the output nodes on the neural network.
+        """
+        a_last = input_x
+        for layer in range(self.layers - 1):
+            z = a_last * self.get_layer_weights(layer)
+            a_last = activation(z) if layer != self.layers - 2 else z
+
+        return a_last
 
     def cost(self):
         pass
