@@ -35,6 +35,15 @@ class NeuralNet:
             self.weights = np.append(self.weights,
                                      np.random.normal(scale=0.1, size=tuple(self.sizes[i:i+2])))
 
+
+    def set_weights(self, weights):
+        """
+        Set the weights for the neural net. It is assumed that you pass in a numpy
+        array of the right size
+        """
+        self.weights = weights.copy()
+
+
     def get_layer_weights(self, layer):
         """
         Gets the matrix of weights between a given layer and the next layer from the
@@ -62,7 +71,11 @@ class NeuralNet:
         pass
 
     def get_weights(self):
-        return self.weights
+        """
+        Returns all the weights as a flat vector. It is guaranteed to be a copy of
+        the weights used internally.
+        """
+        return self.weights.copy()
 
     def predict(self, input_x):
         """
