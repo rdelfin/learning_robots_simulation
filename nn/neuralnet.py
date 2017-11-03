@@ -20,9 +20,11 @@ class NeuralNet:
     stochastic gradient descent. This one makes use of the sigmoid activation function
     for all but the last neuron, which uses a linear activation.
     """
-    def __init__(self, sizes):
+    def __init__(self, sizes, alpha):
         self.sizes = list(sizes)
         self.layers = len(sizes)
+        self.samples = np.array([])
+        self.alpha = alpha
         self.reset_weights()
 
     def reset_weights(self):
@@ -65,10 +67,25 @@ class NeuralNet:
         return np.matrix(weight_subset)
 
     def add_sample(self, sample_x, sample_y):
-        pass
+        """
+        Add a sample for training in the next call of the train() method
+        """
+        if(len(self.samples)):
+            self.samples = np.array([[sample_x, sample_y]])
+        else:
+            self.samples = np.concatenate(self.samples, [[sample_x, sample_y]])
 
     def train(self):
-        pass
+        """
+        Trains the neural network with all the samples added with the
+        add_sample() method since the last time the network was trained.
+        """
+        training_examples = self.samples.copy()
+        self.samples = np.array([])
+
+        grad_vec = self.gradient(training_examples)
+        self.set_weights(self.weights - self.alpha*grad_vec)
+
 
     def get_weights(self):
         """
@@ -89,8 +106,15 @@ class NeuralNet:
 
         return a_last
 
-    def cost(self):
+    def cost(self, training_set):
         pass
 
     def accuracy(self, test_set):
+        pass
+
+    def gradient(self, training_set):
+        """
+        Calculates the gradient vector for the neural network of the cost
+        function over the training set with respect to the weights.
+        """
         pass
