@@ -18,11 +18,13 @@ def stat_travel_time(pairs_list):
     
     result_dict = {pair: { \
                     "mean": np.mean(time_dict[pair]), \
-                    "std_dev": np.std(time_dict[pair]), \
+                    "std_dev": np.std(time_dict[pair], ddof=1), \
                     "p_complete": sum(complete_dict[pair]) / len(complete_dict[pair]) \
                    } \
                    for pair in time_dict \
                    if len(time_dict[pair]) > 1}
+
+    return result_dict
 
 def to_pairs_list(travel_data, locations):
     """
