@@ -121,4 +121,20 @@ class NeuralNet:
         Calculates the gradient vector for the neural network of the cost
         function over the training set with respect to the weights.
         """
-        pass
+        training_x = np.mat(training_set[0])
+        training_y = np.mat(training_set[1])
+
+        a = [np.mat(training_x)]
+        z = [np.mat(training_x)]
+        for layer in range(self.layers - 1):
+            z += [a[-1] * self.get_layer_weights(layer)]
+            a += [activation(z[-1]) if layer != self.layers - 2 else z]
+
+        del_error = [a[-1] - training_y]
+        weight_layer_gradient = []
+
+        for layer in range(self.layers - 2, -1, -1):
+            layer_weights = self.get_layer_weights(layer)
+
+            for j in range(self.sizes[layer + 1]):
+                del_error.insert( 0, layer_weights * np.multiply(a[layer + 1], del_error[0]) )
