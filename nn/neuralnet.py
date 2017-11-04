@@ -4,7 +4,7 @@ def activation(x):
     """
     Returns the sigmoid activation function for all values in x
     """
-    return 1.0 / 1 + np.exp(-x)
+    return 1.0 / (1 + np.exp(-x))
 
 def d_activation(x):
     """
@@ -12,7 +12,7 @@ def d_activation(x):
     for all values of x
     """
     a = activation(x)
-    return a * (1 - a)
+    return np.multiply(a, (1 - a))
 
 class NeuralNet:
     """
@@ -23,7 +23,8 @@ class NeuralNet:
     def __init__(self, sizes, alpha):
         self.sizes = list(sizes)
         self.layers = len(sizes)
-        self.samples = np.array([])
+        self.samples_x = np.array([])
+        self.samples_y = np.array([])
         self.alpha = alpha
         self.reset_weights()
 
@@ -70,18 +71,21 @@ class NeuralNet:
         """
         Add a sample for training in the next call of the train() method
         """
-        if(len(self.samples)):
-            self.samples = np.array([[sample_x, sample_y]])
+        if(len(self.samples_x)):
+            self.samples_x = np.array([sample_x])
+            self.samples_y = np.array([sample_y])
         else:
-            self.samples = np.concatenate(self.samples, [[sample_x, sample_y]])
+            self.samples_x = np.concatenate(self.samples_x, [sample_x])
+            self.samples_y = np.concatenate(self.samples_y, [sample_y])
 
     def train(self):
         """
         Trains the neural network with all the samples added with the
         add_sample() method since the last time the network was trained.
         """
-        training_examples = self.samples.copy()
-        self.samples = np.array([])
+        training_examples = (self.samples_x.copy(), self.samples_y.copy())
+        self.samples_x = np.array([])
+        self.samples_y = np.array([])
 
         grad_vec = self.gradient(training_examples)
         self.set_weights(self.weights - self.alpha*grad_vec)
