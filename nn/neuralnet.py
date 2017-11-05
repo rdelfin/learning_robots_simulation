@@ -143,6 +143,13 @@ class NeuralNet:
 
             for layer in range(self.layers - 2, -1, -1):
                 layer_weights = self.get_layer_weights(layer)
-
                 grad[layer] += a_t[layer].transpose() * np.multiply(d_activation(z_t[layer + 1]), del_error)
                 del_error = np.multiply(a[layer + 1], del_error[0]) * layer_weights.transpose()
+
+        grad_unrolled = np.array([])
+        for layer_grad in grad:
+            layer_unrolled = layer_grad.copy()
+            layer_unrolled.resize(layer_grad.shape[0] * layer_grad.shape[1])
+            np.append(grad_unrolled, layer_unrolled)
+
+        return grad_unrolled
