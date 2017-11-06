@@ -121,35 +121,56 @@ class NeuralNet:
         Calculates the gradient vector for the neural network of the cost
         function over the training set with respect to the weights.
         """
+        # Put training into matrices
         training_x = np.mat(training_set[0])
         training_y = np.mat(training_set[1])
 
+        # Initialize activation (a) and pre-activation neuron values (z)
+        # The invariant holds that a[t] = activation(z[t], t), where
+        # activation(*, t) is the activation function for layer t
         a = [training_x.copy()]
         z = [training_x.copy()]
 
+        # Forward propagation
         for layer in range(self.layers - 1):
             z += [a[-1] * self.get_layer_weights(layer)]
             a += [activation(z[-1]) if layer != self.layers - 2 else z]
 
+        # Initialize gradient with all zeros
         grad = [np.mat(np.zeros((self.sizes[layer], self.sizes[layer+1]))) for layer in range(self.layers - 1)]
 
+        # --------------------------------------------------------
+        # ---------------- BACK PROPAGATION ----------------------
+        # --------------------------------------------------------
+
+        # Iterate over every sample
         for t in range(len(training_x)):
             sample_x = training_x[t]
             sample_y = training_y[t]
 
+            # Get sample's activation and pre-activation values
             a_t = [act_layer[t] for act_layer in a]
             z_t = [z_layer[t] for z_layer in z]
+
+            # Calculate errors on last layer
             del_error = a_t[-1] - sample_y
 
+            # Go back through each layer
             for layer in range(self.layers - 2, -1, -1):
                 layer_weights = self.get_layer_weights(layer)
+                # Updates for said layer's weight graduends
                 grad[layer] += a_t[layer].transpose() * np.multiply(d_activation(z_t[layer + 1]), del_error)
+                # Update delta relative to activations (aka dC/da[t])
                 del_error = np.multiply(a[layer + 1], del_error[0]) * layer_weights.transpose()
 
+        # Unroll gradient into a single vector
         grad_unrolled = np.array([])
         for layer_grad in grad:
             layer_unrolled = layer_grad.copy()
             layer_unrolled.resize(layer_grad.shape[0] * layer_grad.shape[1])
-            np.append(grad_unrolled, layer_unrolled)
+            grad_unrolled = np.append(grad_unrolled, layer_unrolled)
+
+        # Ensure this AVERAGES all the training examples (not the sum)
+        grad_unrolled /= len(training_x)
 
         return grad_unrolled
