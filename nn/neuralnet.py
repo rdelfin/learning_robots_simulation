@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def activation(x):
     """
     Returns the sigmoid activation function for all values in x
@@ -35,8 +36,9 @@ class NeuralNet:
         """
         self.weights = []
         for i in range(self.layers - 1):
+            size = (self.sizes[i] + 1, self.sizes[i+1])
             self.weights = np.append(self.weights,
-                                     np.random.normal(scale=0.1, size=tuple(self.sizes[i:i+2])))
+                                     np.random.normal(scale=0.1, size=size))
 
 
     def set_weights(self, weights):
@@ -58,8 +60,8 @@ class NeuralNet:
         Where last_layer_activation_vector is a row (aka horizontal) vector.
         """
         dims = (self.sizes[layer], self.sizes[layer+1])
-        size = dims[0] * dims[1]
-        next_pairs = ((self.sizes[i], self.sizes[i+1]) for i in range(layer))
+        size = (dims[0] + 1) * dims[1]
+        next_pairs = ((self.sizes[i] + 1, self.sizes[i+1]) for i in range(layer))
         offset = sum(pair[0] * pair[1] for pair in next_pairs)
 
         weight_subset = self.weights[offset:offset+size].copy()
@@ -105,6 +107,8 @@ class NeuralNet:
         """
         a_last = input_x
         for layer in range(self.layers - 1):
+            bias_node = np.mat(np.ones((a_last.shape[0], 1)))
+            a_last = np.insert(a_last, [a_last.shape[1]], bias_node, axis=1)
             z = a_last * self.get_layer_weights(layer)
             a_last = activation(z) if layer != self.layers - 2 else z
 
@@ -133,6 +137,8 @@ class NeuralNet:
 
         # Forward propagation
         for layer in range(self.layers - 1):
+            bias_node = np.mat(np.ones((a[-1].shape[0], 1)))
+            a[-1] = np.insert(a[-1], [a[-1].shape[1]], bias_node, axis=1)
             z += [a[-1] * self.get_layer_weights(layer)]
             a += [activation(z[-1]) if layer != self.layers - 2 else z]
 
