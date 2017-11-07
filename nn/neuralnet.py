@@ -164,8 +164,10 @@ class NeuralNet:
             # Go back through each layer
             for layer in range(self.layers - 2, -1, -1):
                 layer_weights = self.get_layer_weights(layer)
-                # Updates for said layer's weight graduends
-                grad[layer] += a_t[layer].transpose() * np.multiply(d_activation(z_t[layer + 1]), del_error)
+                # Grab correct activation derivative
+                act_deriv = lambda x: (d_activation(x) if layer != self.layers - 2 else 1)
+                # Updates for said layer's weight gradiends
+                grad[layer] += a_t[layer].transpose() * np.multiply(act_deriv(z_t[layer + 1]), del_error)
                 # Update delta relative to activations (aka dC/da[t])
                 del_error = np.multiply(a[layer + 1], del_error[0]) * layer_weights.transpose()
 
