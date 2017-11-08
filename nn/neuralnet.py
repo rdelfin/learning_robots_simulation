@@ -1,3 +1,9 @@
+"""
+Implements a simple, feed forward fully connected neural network with a sigmoid activation function
+for all layers except the last layer (which uses a simple linear activation function s(x)=x). It
+also uses a stochastic gradient descent method. This is well suited for value function estimation
+in Reinforcement Learning tasks.
+"""
 import numpy as np
 
 
@@ -59,8 +65,8 @@ class NeuralNet:
         ```
         Where last_layer_activation_vector is a row (aka horizontal) vector.
         """
-        dims = (self.sizes[layer], self.sizes[layer+1])
-        size = (dims[0] + 1) * dims[1]
+        dims = (self.sizes[layer] + 1, self.sizes[layer+1])
+        size = dims[0] * dims[1]
         next_pairs = ((self.sizes[i] + 1, self.sizes[i+1]) for i in range(layer))
         offset = sum(pair[0] * pair[1] for pair in next_pairs)
 
@@ -105,7 +111,7 @@ class NeuralNet:
         Takes in a given sample (input_x) and calculates the predicted values of
         the output nodes on the neural network.
         """
-        a_last = input_x
+        a_last = input_x.copy()
         for layer in range(self.layers - 1):
             bias_node = np.mat(np.ones((a_last.shape[0], 1)))
             a_last = np.insert(a_last, [a_last.shape[1]], bias_node, axis=1)
@@ -115,7 +121,13 @@ class NeuralNet:
         return a_last
 
     def cost(self, training_set):
-        pass
+        training_x = np.mat(training_set[0])
+        training_y = np.mat(training_set[1])
+        samples = len(training_y)
+
+        predicted = self.predict(training_x)
+
+        return np.sum(np.power(training_y - self.predict(training_x), 2)) / (2 * samples)
 
     def accuracy(self, test_set):
         pass
@@ -140,10 +152,10 @@ class NeuralNet:
             bias_node = np.mat(np.ones((a[-1].shape[0], 1)))
             a[-1] = np.insert(a[-1], [a[-1].shape[1]], bias_node, axis=1)
             z += [a[-1] * self.get_layer_weights(layer)]
-            a += [activation(z[-1]) if layer != self.layers - 2 else z]
+            a += [activation(z[-1]) if layer != self.layers - 2 else z[-1]]
 
         # Initialize gradient with all zeros
-        grad = [np.mat(np.zeros((self.sizes[layer], self.sizes[layer+1]))) for layer in range(self.layers - 1)]
+        grad = [np.mat(np.zeros((self.sizes[layer]+1, self.sizes[layer+1]))) for layer in range(self.layers - 1)]
 
         # --------------------------------------------------------
         # ---------------- BACK PROPAGATION ----------------------
@@ -159,17 +171,33 @@ class NeuralNet:
             z_t = [z_layer[t] for z_layer in z]
 
             # Calculate errors on last layer
+            print("a_t: " + str(a_t))
             del_error = a_t[-1] - sample_y
 
             # Go back through each layer
             for layer in range(self.layers - 2, -1, -1):
                 layer_weights = self.get_layer_weights(layer)
                 # Grab correct activation derivative
-                act_deriv = lambda x: (d_activation(x) if layer != self.layers - 2 else 1)
-                # Updates for said layer's weight gradiends
-                grad[layer] += a_t[layer].transpose() * np.multiply(act_deriv(z_t[layer + 1]), del_error)
+                act_deriv = lambda x: (d_activation(x) if layer != self.layers - 2 else np.ones(x.shape))
+                # Calculate next layer activation and add bias node
+                next_act_d = act_deriv(z_t[layer + 1])
+
+                print("WEGHTS SHAPE: " + str(layer_weights.shape))
+                print("A_T SHAPE:    " + str(a_t[layer].shape))
+                print("DEL SHAPE:    " + str(del_error.shape))
+                print("GRAD SHAPE:   " + str(grad[layer].shape))
+                print("NEXT Z SHAPE: " + str(z_t[layer + 1].shape))
+                print("NEXT D SHAPE: " + str(next_act_d.shape))
+                print("NEXT A SHAPE: " + str(a_t[layer+1].shape))
+                print()
+                # Updates for said layer's weight gradients
+                grad[layer] += a_t[layer].transpose() * np.multiply(next_act_d, del_error)
+                # Calculate the next layer's activation (with bias removed)
+                a_t_next = np.delete(a_t[layer + 1], a_t[layer + 1].shape[1] - 1, 1) if layer < self.layers - 2 else a_t[layer + 1].copy()
                 # Update delta relative to activations (aka dC/da[t])
-                del_error = np.multiply(a[layer + 1], del_error[0]) * layer_weights.transpose()
+                del_error = np.sum(np.multiply(a_t_next, del_error[0]) * layer_weights.transpose(), axis=0)
+                # Remove the del_error corresponding to the bias neurons
+                del_error = np.delete(del_error, del_error.shape[1] - 1, 1)
 
         # Unroll gradient into a single vector
         grad_unrolled = np.array([])
