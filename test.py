@@ -3,7 +3,7 @@ from nn.neuralnet import NeuralNet
 
 import numpy as np
 
-delta = 0.000000000001
+delta = 0.00000001
 
 class NeuralNetTest(TestCase):
     def test_cost(self):
@@ -55,7 +55,12 @@ class NeuralNetTest(TestCase):
         test_nn.set_weights(weights)
         backprop_grad = test_nn.gradient(training_examples)
 
-        self.assertLessEqual(max(np.abs(backprop_grad - estimate_grad)), max(backprop_grad) * 0.05)
+        #print("Backpropagation gradient: \n" + str(backprop_grad))
+        #print("Estimate gradient: \n" + str(estimate_grad))
+        #print("Norm of distance: " + str(np.linalg.norm(backprop_grad - estimate_grad)))
+
+        self.assertLessEqual(np.linalg.norm(backprop_grad - estimate_grad),
+                             np.linalg.norm(estimate_grad) * 0.005)
 
 
 if __name__ == "__main__": # pragma: no cover
