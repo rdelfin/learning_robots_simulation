@@ -181,15 +181,7 @@ class NeuralNet:
                 act_deriv = lambda x: (d_activation(x) if layer != self.layers - 2 else np.ones(x.shape))
                 # Calculate next layer activation and add bias node
                 next_act_d = act_deriv(z_t[layer + 1])
-
-                print("WEGHTS SHAPE: " + str(layer_weights.shape))
-                print("A_T SHAPE:    " + str(a_t[layer].shape))
-                print("DEL SHAPE:    " + str(del_error.shape))
-                print("GRAD SHAPE:   " + str(grad[layer].shape))
-                print("NEXT Z SHAPE: " + str(z_t[layer + 1].shape))
-                print("NEXT D SHAPE: " + str(next_act_d.shape))
-                print("NEXT A SHAPE: " + str(a_t[layer+1].shape))
-                print()
+                
                 # Updates for said layer's weight gradients
                 grad[layer] += a_t[layer].transpose() * np.multiply(next_act_d, del_error)
                 # Calculate the next layer's activation (with bias removed)
