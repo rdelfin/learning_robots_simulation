@@ -40,7 +40,7 @@ class NeuralNet:
         Resets all the weights in the neural network to a normal distribution around
         0 with standard deviation of 0.1.
         """
-        self.weights = []
+        self.weights = np.array([])
         for i in range(self.layers - 1):
             size = (self.sizes[i] + 1, self.sizes[i+1])
             self.weights = np.append(self.weights,
@@ -52,7 +52,7 @@ class NeuralNet:
         Set the weights for the neural net. It is assumed that you pass in a numpy
         array of the right size
         """
-        self.weights = weights.copy()
+        self.weights = np.array(weights).flatten().copy()
 
 
     def get_layer_weights(self, layer):
@@ -111,14 +111,17 @@ class NeuralNet:
         Takes in a given sample (input_x) and calculates the predicted values of
         the output nodes on the neural network.
         """
-        a_last = input_x.copy()
-        for layer in range(self.layers - 1):
-            bias_node = np.mat(np.ones((a_last.shape[0], 1)))
-            a_last = np.insert(a_last, [a_last.shape[1]], bias_node, axis=1)
-            z = a_last * self.get_layer_weights(layer)
-            a_last = activation(z) if layer != self.layers - 2 else z
+        a = [input_x.copy()]
+        z = [input_x.copy()]
 
-        return a_last
+        # Forward propagation
+        for layer in range(self.layers - 1):
+            bias_node = np.mat(np.ones((a[-1].shape[0], 1)))
+            a[-1] = np.insert(a[-1], [a[-1].shape[1]], bias_node, axis=1)
+            z += [a[-1] * self.get_layer_weights(layer)]
+            a += [activation(z[-1]) if layer != self.layers - 2 else z[-1]]
+
+        return a[-1]
 
     def cost(self, training_set):
         training_x = np.mat(training_set[0])
@@ -127,6 +130,7 @@ class NeuralNet:
 
         predicted = self.predict(training_x)
 
+        print("Predicted: " + str(predicted))
         return np.sum(np.power(training_y - predicted, 2)) / (2 * samples)
 
     def accuracy(self, test_set):
