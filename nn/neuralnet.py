@@ -129,8 +129,6 @@ class NeuralNet:
         samples = len(training_y)
 
         predicted = self.predict(training_x)
-
-        print("Predicted: " + str(predicted))
         return np.sum(np.power(training_y - predicted, 2)) / (2 * samples)
 
     def accuracy(self, test_set):
@@ -187,10 +185,8 @@ class NeuralNet:
 
                 # Updates for said layer's weight gradients
                 grad[layer] += a_t[layer].transpose() * np.multiply(next_act_d, del_error)
-                # Calculate the next layer's activation (with bias removed)
-                a_t_next = np.delete(a_t[layer + 1], a_t[layer + 1].shape[1] - 1, 1) if layer < self.layers - 2 else a_t[layer + 1].copy()
                 # Update delta relative to activations (aka dC/da[t])
-                del_error = np.sum(np.multiply(a_t_next, del_error[0]) * layer_weights.transpose(), axis=0)
+                del_error = np.sum(np.multiply(act_deriv(z_t[layer+1]), del_error[0]) * layer_weights.transpose(), axis=0)
                 # Remove the del_error corresponding to the bias neurons
                 del_error = np.delete(del_error, del_error.shape[1] - 1, 1)
 
