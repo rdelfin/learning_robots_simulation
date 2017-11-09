@@ -117,6 +117,7 @@ class NeuralNet:
             a_last = np.insert(a_last, [a_last.shape[1]], bias_node, axis=1)
             z = a_last * self.get_layer_weights(layer)
             a_last = activation(z) if layer != self.layers - 2 else z
+            print("A_LAST: " + str(a_last))
 
         return a_last
 
@@ -127,7 +128,7 @@ class NeuralNet:
 
         predicted = self.predict(training_x)
 
-        return np.sum(np.power(training_y - self.predict(training_x), 2)) / (2 * samples)
+        return np.sum(np.power(training_y - predicted, 2)) / (2 * samples)
 
     def accuracy(self, test_set):
         pass
@@ -171,7 +172,6 @@ class NeuralNet:
             z_t = [z_layer[t] for z_layer in z]
 
             # Calculate errors on last layer
-            print("a_t: " + str(a_t))
             del_error = a_t[-1] - sample_y
 
             # Go back through each layer
@@ -181,7 +181,7 @@ class NeuralNet:
                 act_deriv = lambda x: (d_activation(x) if layer != self.layers - 2 else np.ones(x.shape))
                 # Calculate next layer activation and add bias node
                 next_act_d = act_deriv(z_t[layer + 1])
-                
+
                 # Updates for said layer's weight gradients
                 grad[layer] += a_t[layer].transpose() * np.multiply(next_act_d, del_error)
                 # Calculate the next layer's activation (with bias removed)
