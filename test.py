@@ -20,12 +20,15 @@ class NeuralNetTest(TestCase):
             del_vector = np.eye(1, len(weights), i) * delta / 2
             weights_lower = weights - del_vector
             weights_upper = weights + del_vector
+
+            print("WEIGHTS UPPER: " + str(weights_upper))
+            print("WEIGHTS LOWER: " + str(weights_lower))
+
+
             test_nn.set_weights(weights_lower)
             lower_cost = test_nn.cost(training_examples)
-            print("LOWER COST: " + str(lower_cost))
             test_nn.set_weights(weights_upper)
             upper_cost = test_nn.cost(training_examples)
-            print("UPPER COST: " + str(lower_cost))
             estimate_grad[i] = (upper_cost - lower_cost) / delta
 
         test_nn.set_weights(weights)

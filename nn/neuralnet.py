@@ -117,7 +117,6 @@ class NeuralNet:
             a_last = np.insert(a_last, [a_last.shape[1]], bias_node, axis=1)
             z = a_last * self.get_layer_weights(layer)
             a_last = activation(z) if layer != self.layers - 2 else z
-            print("A_LAST: " + str(a_last))
 
         return a_last
 
