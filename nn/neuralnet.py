@@ -124,6 +124,10 @@ class NeuralNet:
         return a[-1]
 
     def cost(self, training_set):
+        """
+        The cost of the predictions for the training set provided in. It is measured
+        according to a least-squares error between the predicted and actual outputs.
+        """
         training_x = np.mat(training_set[0])
         training_y = np.mat(training_set[1])
         samples = len(training_y)
