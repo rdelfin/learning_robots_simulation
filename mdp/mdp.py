@@ -39,7 +39,13 @@ class MDP():
         if self.curr_state == self.terminal_state:
             self.episode_done = True
 
-        return self.episode_done
+        return (reward, self.curr_state)
+
+    def current_state(self):
+        """
+        Returns the current state
+        """
+        return self.curr_state
 
     def is_terminal(self):
         """
@@ -52,7 +58,7 @@ class MDP():
         """
         Get the cumulative reward of the episode up to this point. This is
         calculated as:
-        \sum_{t=1}^{T}\lambda^t*R_t
+        .. math:: \sum_{t=1}^{T}\lambda^t*R_t
         Where T is the current timestep, lambda is the discount factor, and
         R_t is the reward given at timestep t.
         """
