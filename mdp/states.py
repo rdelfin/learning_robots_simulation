@@ -8,3 +8,6 @@ class FullState:
 
     def time_only_state(self):
         return (self.time_of_day, self.day_of_week)
+
+    def time_and_location_state(self):
+        return (self.time_of_day, self.day_of_week, self.location)
