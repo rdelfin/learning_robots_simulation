@@ -1,3 +1,9 @@
+class Request:
+    def __init__(self, *, location, time_of_day, day_of_week):
+        self.location = location
+        self.time_of_day = time_of_day
+        self.day_of_week = day_of_week
+
 class FullState:
     def __init__(self, *, location, time_of_day, day_of_week, person_present_map, request_history):
         self.location = location
