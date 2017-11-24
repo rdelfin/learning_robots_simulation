@@ -4,6 +4,11 @@ class Request:
         self.time_of_day = time_of_day
         self.day_of_week = day_of_week
 
+class Action:
+    def __init__(self, travel=False, location=None):
+        self.travel = travel
+        self.location = location
+
 class FullState:
     def __init__(self, *, location, time_of_day, day_of_week, person_present_map, request_history):
         self.location = location
