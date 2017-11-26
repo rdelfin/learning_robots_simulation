@@ -51,11 +51,11 @@ def transition_func(state, action):
 
                 # Each person's arrival to their office is modeled as a normal distribution centered around their scheduled time of arrival.
                 p_intervals = (probability_interval(interval, state.time_of_day, time_of_day, arrival_stddev, True) for interval in intervals)
-                for idx, prob in enumerate(prob):
+                for idx, prob in enumerate(p_intervals):
                     if random.random() < prob:
                         new_present_map[person] = int(sample_probability_interval(intervals[idx], state.time_of_day, time_of_day, arrival_stddev, True))
                         break
-            else:
+            elif "intervals-daily" in schedule:
                 # Open area
                 daily_intervals = schedule["intervals-daily"]
                 p_second_arrival = daily_intervals / 24.0 / 60.0 / 60.0
@@ -77,7 +77,7 @@ def transition_func(state, action):
                         break
             
             # Non-scheduled offices (mostly open spaces)
-            else:
+            elif "intervals-daily" in schedule:
                 interval = util.Interval(
                                 util.Time(state.time_of_day, new_present_map[person]),
                                 util.Time(state.time_of_day, new_present_map[person] + schedule["duration"]))
@@ -110,11 +110,11 @@ class Simulation:
         self.discount_factor = 0.9
         self.locations = travel_data.get_locations()
         self.location_ids = [key for key in self.locations]
-        initial_state = FullState(location=random.choice(self.locations),
-                                  time_of_day=540, # 9:00 am, number of minutes
-                                  day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
-                                  person_present_map={person: None for person in self.locations},
-                                  request_history=[])
+        self.initial_state = FullState(location=random.choice(list(self.locations.keys())),
+                                       time_of_day=540, # 9:00 am, number of minutes
+                                       day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
+                                       person_present_map={person: None for person in self.locations},
+                                       request_history=[])
         self.mdp = MDP(transition_func, reward_func, self.discount_factor)
 
     def run_episode(self):
