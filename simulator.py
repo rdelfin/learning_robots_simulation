@@ -106,16 +106,27 @@ def reward_func(state, action, newState):
     return 0
 
 class Simulation:
-    def __init__(self):
-        self.discount_factor = 0.9
+    def __init__(self, agent, discount_factor):
+        self.discount_factor = discount_factor
         self.locations = travel_data.get_locations()
         self.location_ids = [key for key in self.locations]
+        self.mdp = MDP(transition_func, reward_func, self.discount_factor)
+        self.agent = agent
+
+    def generate_initial_state(self):
         self.initial_state = FullState(location=random.choice(list(self.locations.keys())),
                                        time_of_day=540, # 9:00 am, number of minutes
                                        day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
                                        person_present_map={person: None for person in self.locations},
                                        request_history=[])
-        self.mdp = MDP(transition_func, reward_func, self.discount_factor)
 
     def run_episode(self):
-        pass
+        self.generate_initial_state()
+        self.mdp.reset_world(self.initial_state)
+        
+        while not self.mdp.is_terminal():
+            state = self.mdp.current_state()
+            new_reward_state = self.mdp.step(self.agent.next_action(state))
+            self.agent.action_update(*new_reward_state)
+        
+        return self.mdp.get_episode_utility()
