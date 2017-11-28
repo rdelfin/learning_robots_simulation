@@ -22,7 +22,6 @@ def sample_probability_interval(interval, start_time, end_time, stddev, arrival)
     return scipy.stats.truncnorm.rvs(min_trunc, max_trunc, loc=mean, scale=stddev)
 
 def transition_func(state, action):
-
     # Update location and time
     travel_stats = travel_data.stat_travel_time(
                         travel_data.to_pairs_list(
