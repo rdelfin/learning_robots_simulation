@@ -12,12 +12,12 @@ class MDP():
     to provide reward and transition functions, as well as a discount value,
     and terminal state.
     """
-    def __init__(self, transition_func, reward_func, discount, terminal_state = TERMINAL_STATE):
+    def __init__(self, transition_func, reward_func, discount, terminal_state_test = lambda x: x == TERMINAL_STATE):
         self.transition_func = transition_func
         self.reward_func = reward_func
         self.discount = discount
         self.cumulative_reward = 0
-        self.terminal_state = terminal_state
+        self.terminal_state_test = terminal_state_test
         self.episode_done = True
         self.curr_state = None
 
@@ -36,7 +36,7 @@ class MDP():
         self.curr_state = new_state
         self.cumulative_reward = reward + self.discount*self.cumulative_reward
 
-        if self.curr_state == self.terminal_state:
+        if self.terminal_state_test(self.curr_state):
             self.episode_done = True
 
         return (reward, self.curr_state)

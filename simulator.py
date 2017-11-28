@@ -1,5 +1,5 @@
 from firebase_scripts import travel_data, schedule_data
-from mdp.states import FullState, Request, Action
+from mdp.states import FullState, Request, Action, is_terminal_state
 from mdp.mdp import MDP
 import random
 import util
@@ -110,12 +110,12 @@ class Simulation:
         self.discount_factor = discount_factor
         self.locations = travel_data.get_locations()
         self.location_ids = [key for key in self.locations]
-        self.mdp = MDP(transition_func, reward_func, self.discount_factor)
+        self.mdp = MDP(transition_func, reward_func, self.discount_factor, is_terminal_state)
         self.agent = agent
 
     def generate_initial_state(self):
         self.initial_state = FullState(location=random.choice(list(self.locations.keys())),
-                                       time_of_day=540, # 9:00 am, number of minutes
+                                       time_of_day=32400, # 9:00 am, number of seconds
                                        day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
                                        person_present_map={person: None for person in self.locations},
                                        request_history=[])
