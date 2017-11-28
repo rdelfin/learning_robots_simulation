@@ -16,6 +16,9 @@ class Action:
     def __repr__(self):
         return "Action(travel=%s, location=%s)" % (str(self.travel), self.location)
 
+def is_terminal_state(state):
+    return state.time_of_day > 64800  # 6pm in seconds
+
 class FullState:
     def __init__(self, *, location, time_of_day, day_of_week, person_present_map, request_history):
         self.location = location
