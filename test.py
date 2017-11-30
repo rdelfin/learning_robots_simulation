@@ -55,10 +55,6 @@ class NeuralNetTest(TestCase):
         test_nn.set_weights(weights)
         backprop_grad = test_nn.gradient(training_examples)
 
-        #print("Backpropagation gradient: \n" + str(backprop_grad))
-        #print("Estimate gradient: \n" + str(estimate_grad))
-        #print("Norm of distance: " + str(np.linalg.norm(backprop_grad - estimate_grad)))
-
         self.assertLessEqual(np.linalg.norm(backprop_grad - estimate_grad),
                              np.linalg.norm(estimate_grad) * 0.005)
 

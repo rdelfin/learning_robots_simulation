@@ -1,6 +1,7 @@
 import pyrebase
 import firebase_scripts.__config__ as config
 import numpy as np
+from functools import lru_cache
 
 def stat_travel_time(pairs_list):
     """
@@ -18,11 +19,10 @@ def stat_travel_time(pairs_list):
     
     result_dict = {pair: { \
                     "mean": np.mean(time_dict[pair]), \
-                    "std_dev": np.std(time_dict[pair], ddof=1), \
                     "p_complete": sum(complete_dict[pair]) / len(complete_dict[pair]) \
                    } \
                    for pair in time_dict \
-                   if len(time_dict[pair]) > 1}
+                   if len(time_dict[pair]) > 0}
 
     return result_dict
 
@@ -43,6 +43,7 @@ def to_pairs_list(travel_data, locations):
 
     return pair_data
 
+@lru_cache(maxsize=100)
 def get_locations():
     """
     Gets a dict of all locations as used by the robots indexed by their id's.
@@ -53,6 +54,7 @@ def get_locations():
     db = firebase_app.database()
     return db.child("locations").get().val()
 
+@lru_cache(maxsize=100)
 def get_location_ids():
     """
     Gets a list of all location id's used by the robot.
@@ -62,6 +64,7 @@ def get_location_ids():
     loc_list = db.child("locations").get()
     return set(location.key() for location in loc_list.each())
 
+@lru_cache(maxsize=100)
 def get_travel_data():
     """
     Gets a list of every trip the robot has done. Each trip is a dictionary
