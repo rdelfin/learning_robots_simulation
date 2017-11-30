@@ -8,7 +8,7 @@ import random
 
 import numpy as np
 
-class QLearningAgent(Agent):
+class SarsaAgent(Agent):
     def __init__(self, eps, alpha, gamma, estimator: FunctionEstimator):
         # FIX: Stop depending on states class to define sizes
         # 8 input neurons:
