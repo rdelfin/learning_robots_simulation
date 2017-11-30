@@ -1,5 +1,6 @@
 from mdp.states import state_action_reducer
 from nn.neuralnet import NeuralNet
+import numpy as np
 
 class FunctionEstimator:
     def get_qval(self, state, action):
@@ -27,7 +28,7 @@ class NeuralNetEstimator(FunctionEstimator):
     
     def get_grad(self, state, action):
         input_form = state_action_reducer(state, action)
-        return self.nn.gradient(input_form)
+        return self.nn.gradient((input_form, np.mat([0])))
     
     def set_weights(self, weights):
         self.nn.set_weights(weights)
