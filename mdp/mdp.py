@@ -69,6 +69,6 @@ class MDP():
         Resets the episote by reseting the state, cumulative reward, and set
         episode done to false.
         """
-        self.initial_state = initial_state
+        self.curr_state = initial_state
         self.cumulative_reward = 0
         self.episode_done = False

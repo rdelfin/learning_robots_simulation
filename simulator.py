@@ -113,11 +113,7 @@ class Simulation:
         self.agent = agent
 
     def generate_initial_state(self):
-        self.initial_state = FullState(location=random.choice(list(self.locations.keys())),
-                                       time_of_day=32400, # 9:00 am, number of seconds
-                                       day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
-                                       person_present_map={person: None for person in self.locations},
-                                       request_history=[])
+        self.initial_state = get_initial_state(self.locations)
 
     def run_episode(self):
         self.generate_initial_state()
@@ -129,3 +125,10 @@ class Simulation:
             self.agent.action_update(*new_reward_state)
         
         return self.mdp.get_episode_utility()
+
+def get_initial_state(locations):
+    return FullState(location=random.choice(list(locations.keys())),
+                     time_of_day=32400, # 9:00 am, number of seconds
+                     day_of_week=random.randint(0, 6),   # Monday: 0, ..., Sunday: 6
+                     person_present_map={person: None for person in locations},
+                     request_history=[])

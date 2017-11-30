@@ -25,8 +25,8 @@ class SarsaAgent(Agent):
         self.past_state_actions = []
     
     def generate_next_action(self, state: FullState):
-        max_location = max(self.travel_locations, key=lambda loc: self.estimator.get_qval(state, Action(loc, True)))
-        rand_location = random.choice(self.travel_locations)
+        max_location = max(self.travel_locations, key=lambda loc: self.estimator.get_qval(state, Action(True, loc)))
+        rand_location = random.choice(list(self.travel_locations))
 
         action_taken = rand_location if random.random() < self.eps else max_location   # Epsilon-greedy behaviour
         
