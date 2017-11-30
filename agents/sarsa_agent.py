@@ -23,20 +23,20 @@ class SarsaAgent(Agent):
         self.estimator = estimator
         self.future_state_actions = []
         self.past_state_actions = []
-    
+
     def generate_next_action(self, state: FullState):
         max_location = max(self.travel_locations, key=lambda loc: self.estimator.get_qval(state, Action(True, loc)))
         rand_location = random.choice(list(self.travel_locations))
 
         location_taken = rand_location if random.random() < self.eps else max_location   # Epsilon-greedy behaviour
         action_taken = Action(True, location_taken)
-        
+
         self.future_state_actions += [(state, action_taken)]
 
     def next_action(self, state: FullState):
         if(not self.future_state_actions):
             self.generate_next_action(state)
-        
+
         new_action = self.future_state_actions[0][1]
         self.past_state_actions += [self.future_state_actions[0]]
         del self.future_state_actions[0]
@@ -52,5 +52,5 @@ class SarsaAgent(Agent):
             next_sa_pair = self.future_state_actions[0]
             qval_diff = reward + self.gamma * self.estimator.get_qval(*next_sa_pair)
 
-        self.estimator.set_weights(self.estimator.get_weights() + self.estimator.get_grad() * self.alpha * qval_diff)
-        
+        self.estimator.set_weights(self.estimator.get_weights() +
+            self.estimator.get_grad(*self.past_state_actions[-1]) * self.alpha * qval_diff)
