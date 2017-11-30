@@ -3,7 +3,6 @@ import firebase_scripts.__config__ as config
 import numpy as np
 from functools import lru_cache
 
-@lru_cache(maxsize=100)
 def stat_travel_time(pairs_list):
     """
     Creates a dictionary of stats for every item in pairs_list. Each item
@@ -20,15 +19,13 @@ def stat_travel_time(pairs_list):
     
     result_dict = {pair: { \
                     "mean": np.mean(time_dict[pair]), \
-                    "std_dev": np.std(time_dict[pair], ddof=1), \
                     "p_complete": sum(complete_dict[pair]) / len(complete_dict[pair]) \
                    } \
                    for pair in time_dict \
-                   if len(time_dict[pair]) > 1}
+                   if len(time_dict[pair]) > 0}
 
     return result_dict
 
-@lru_cache(maxsize=100)
 def to_pairs_list(travel_data, locations):
     """
     Converts the travel data (a list of dicts with from, to, complete and time
