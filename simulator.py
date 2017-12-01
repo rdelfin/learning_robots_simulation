@@ -74,7 +74,7 @@ def transition_func(state, action):
                     if random.random() < prob:
                         new_present_map[person] = None
                         break
-            
+
             # Non-scheduled offices (mostly open spaces)
             elif "intervals-daily" in schedule:
                 interval = util.Interval(
@@ -101,7 +101,6 @@ def reward_func(state, action, newState):
             p_answer = loc_schedule_data["panswer"] if "panswer" in loc_schedule_data else 1
             return 1 if random.random() < p_answer else 0
 
-    
     return 0
 
 class Simulation:
