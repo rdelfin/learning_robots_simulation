@@ -118,12 +118,12 @@ class Simulation:
     def run_episode(self):
         self.generate_initial_state()
         self.mdp.reset_world(self.initial_state)
-        
+
         while not self.mdp.is_terminal():
             state = self.mdp.current_state()
             new_reward_state = self.mdp.step(self.agent.next_action(state))
             self.agent.action_update(*new_reward_state)
-        
+
         return self.mdp.get_episode_utility()
 
 def get_initial_state(locations):
