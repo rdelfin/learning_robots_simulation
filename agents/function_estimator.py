@@ -28,7 +28,7 @@ class NeuralNetEstimator(FunctionEstimator):
     
     def get_grad(self, state, action):
         input_form = state_action_reducer(state, action)
-        return self.nn.gradient((input_form, np.mat([0])))
+        return self.nn.gradient(input_form)
     
     def set_weights(self, weights):
         self.nn.set_weights(weights)

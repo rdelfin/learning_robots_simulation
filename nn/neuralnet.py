@@ -30,8 +30,6 @@ class NeuralNet:
     def __init__(self, sizes, alpha):
         self.sizes = list(sizes)
         self.layers = len(sizes)
-        self.samples_x = np.array([])
-        self.samples_y = np.array([])
         self.alpha = alpha
         self.reset_weights()
 
@@ -75,30 +73,6 @@ class NeuralNet:
 
         return np.matrix(weight_subset)
 
-    def add_sample(self, sample_x, sample_y):
-        """
-        Add a sample for training in the next call of the train() method
-        """
-        if(len(self.samples_x)):
-            self.samples_x = np.array([sample_x])
-            self.samples_y = np.array([sample_y])
-        else:
-            self.samples_x = np.concatenate(self.samples_x, [sample_x])
-            self.samples_y = np.concatenate(self.samples_y, [sample_y])
-
-    def train(self):
-        """
-        Trains the neural network with all the samples added with the
-        add_sample() method since the last time the network was trained.
-        """
-        training_examples = (self.samples_x.copy(), self.samples_y.copy())
-        self.samples_x = np.array([])
-        self.samples_y = np.array([])
-
-        grad_vec = self.gradient(training_examples)
-        self.set_weights(self.weights - self.alpha*grad_vec)
-
-
     def get_weights(self):
         """
         Returns all the weights as a flat vector. It is guaranteed to be a copy of
@@ -123,29 +97,13 @@ class NeuralNet:
 
         return a[-1]
 
-    def cost(self, training_set):
-        """
-        The cost of the predictions for the training set provided in. It is measured
-        according to a least-squares error between the predicted and actual outputs.
-        """
-        training_x = np.mat(training_set[0])
-        training_y = np.mat(training_set[1])
-        samples = len(training_y)
-
-        predicted = self.predict(training_x)
-        return np.sum(np.power(training_y - predicted, 2)) / (2 * samples)
-
-    def accuracy(self, test_set):
-        pass
-
-    def gradient(self, training_set):
+    def gradient(self, training_x):
         """
         Calculates the gradient vector for the neural network of the cost
         function over the training set with respect to the weights.
         """
         # Put training into matrices
-        training_x = np.mat(training_set[0])
-        training_y = np.mat(training_set[1])
+        training_x = np.mat(training_x, np.float32)
 
         # Initialize activation (a) and pre-activation neuron values (z)
         # The invariant holds that a[t] = activation(z[t], t), where
@@ -170,14 +128,13 @@ class NeuralNet:
         # Iterate over every sample
         for t in range(len(training_x)):
             sample_x = training_x[t]
-            sample_y = training_y[t]
 
             # Get sample's activation and pre-activation values
             a_t = [act_layer[t] for act_layer in a]
             z_t = [z_layer[t] for z_layer in z]
 
             # Calculate errors on last layer
-            del_error = a_t[-1] - sample_y
+            del_error = np.ones_like(a_t[-1])
 
             # Go back through each layer
             for layer in range(self.layers - 2, -1, -1):
