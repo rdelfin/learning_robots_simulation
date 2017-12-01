@@ -6,20 +6,20 @@ in Reinforcement Learning tasks.
 """
 import numpy as np
 
-
 def activation(x):
     """
     Returns the sigmoid activation function for all values in x
     """
-    return 1.0 / (1 + np.exp(-x))
+    return np.maximum(0.001*x, x)
 
 def d_activation(x):
     """
     Implements the derivative of the sigmoid activation function
     for all values of x
     """
-    a = activation(x)
-    return np.multiply(a, (1 - a))
+    deriv = np.maximum(0.001*np.sign(x), np.sign(x))
+    deriv[deriv == 0] = 1
+    return deriv
 
 class NeuralNet:
     """
