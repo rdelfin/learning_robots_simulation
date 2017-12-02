@@ -18,11 +18,10 @@ def stat_travel_time(pairs_list):
     complete_dict = {pair: [travel["completed"] for travel in pairs_list[pair]] for pair in pairs_list}
     
     result_dict = {pair: { \
-                    "mean": np.mean(time_dict[pair]), \
-                    "p_complete": sum(complete_dict[pair]) / len(complete_dict[pair]) \
+                    "mean": np.mean(time_dict[pair]) if len(time_dict[pair]) > 0 else 110, \
+                    "p_complete": sum(complete_dict[pair]) / len(complete_dict[pair]) if len(time_dict[pair]) > 0 else 1 \
                    } \
-                   for pair in time_dict \
-                   if len(time_dict[pair]) > 0}
+                   for pair in time_dict}
 
     return result_dict
 
