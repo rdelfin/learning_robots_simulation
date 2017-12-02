@@ -11,6 +11,14 @@ arrival_stddev = 120
 departure_stddev = 180
 open_stddev = 300
 
+def print_decorator(func):
+    def inner(*args):
+        print("CALLING (%s)" % str(args))
+        out = func(*args)
+        print("Output: %s" % str(out))
+        return out
+    return inner
+
 def probability_interval(interval, start_time, end_time, stddev, arrival):
     mean = interval.start.second if arrival else interval.end.second
     distribution = scipy.stats.norm(mean, stddev)
@@ -80,11 +88,9 @@ def transition_func(state, action):
                 interval = util.Interval(
                                 util.Time(state.time_of_day, new_present_map[person]),
                                 util.Time(state.time_of_day, new_present_map[person] + schedule["duration"]))
-                p_intervals = (probability_interval(interval, state.time_of_day, time_of_day, open_stddev, False) for interval in intervals)
-                for idx, prob in enumerate(p_intervals):
-                    if random.random() < prob:
-                        new_present_map[person] = None
-                        break
+                p_interval = probability_interval(interval, state.time_of_day, time_of_day, open_stddev, False)
+                if random.random() < p_interval:
+                    new_present_map[person] = None
 
     # Resulting state
     return FullState(location=next_location,
@@ -93,6 +99,7 @@ def transition_func(state, action):
                      person_present_map=new_present_map,
                      request_history=new_request_list)
 
+@print_decorator
 def reward_func(state, action, newState):
     if(len(state.request_history) > len(newState.request_history)):
         latest_request = newState.request_history[-1]
