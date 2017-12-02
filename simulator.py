@@ -99,9 +99,8 @@ def transition_func(state, action):
                      person_present_map=new_present_map,
                      request_history=new_request_list)
 
-@print_decorator
 def reward_func(state, action, newState):
-    if(len(state.request_history) > len(newState.request_history)):
+    if len(newState.request_history) > len(state.request_history):
         latest_request = newState.request_history[-1]
         if(newState.person_present_map[latest_request.location]):
             loc_schedule_data = schedule_data.get_schedule_data()[latest_request.location]
