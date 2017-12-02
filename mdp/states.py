@@ -39,9 +39,8 @@ class FullState:
 
     def __repr__(self):
         return "FullState(location=%s, time_of_day=%d, day_of_week=%d," \
-                "person_present_map=%s, request_history=%s)" % \
-                (self.location, self.time_of_day, self.day_of_week, str(self.person_present_map), \
-                str(self.request_history))
+                "person_present_map=%s)" % \
+                (self.location, self.time_of_day, self.day_of_week, str(self.person_present_map))
 
 def state_action_reducer(state, action):
     travel_locations = travel_data.get_location_ids()
