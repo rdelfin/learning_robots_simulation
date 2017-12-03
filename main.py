@@ -46,7 +46,11 @@ def parse_my_args():
     return (eps, alpha, discount, layers)
 
 if __name__ == "__main__":
-    eps, alpha, discount, layers = parse_my_args()
+    #eps, alpha, discount, layers = parse_my_args()
+    eps = float(input("Epsilon: "))
+    alpha = float(input("Alpha: "))
+    discount = float(input("Discount: "))
+    layers = [int(x) for x in input("Layers: ").split()]
     print("Configuration:")
     print("\tEpsilon:  %f" % eps)
     print("\tAlpha:    %f" % alpha)
