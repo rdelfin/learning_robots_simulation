@@ -1,3 +1,6 @@
+import sys
+import argparse
+
 import simulator
 from simulator import Simulation
 from mdp.states import FullState, Action
@@ -17,12 +20,44 @@ def get_nn_sarsa_agent(eps, alpha, gamma, layers):
     estimator = NeuralNetEstimator(sample_state, sample_action, layers)
     return SarsaAgent(eps, alpha, gamma, estimator)
 
+def parse_my_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--epsilon",  type=float, help="Epsilon for epsilon-greedy algorithm")
+    parser.add_argument("-a", "--alpha",    type=float, help="Learning rate for approximate SARSA algorithm")
+    parser.add_argument("-d", "--discount", type=float, help="Discount factor for the MDP")
+    parser.add_argument("-l", "--layers",    type=int,nargs='+', help="Number of neurons at each layer of the neural network")
+
+    args = parser.parse_args()
+
+    eps = 0.1
+    alpha = 0.5
+    discount = 1.0
+    layers = [20, 10]
+
+    if args.epsilon:
+        eps = args.epsilon
+    if args.alpha:
+        alpha = args.alpha
+    if args.discount:
+        discount = args.discount
+    if args.layers:
+        layers = args.layers
+
+    return (eps, alpha, discount, layers)
+
 if __name__ == "__main__":
-    sarsa_agent = get_nn_sarsa_agent(0.1, 0.5, 1, [20, 10])
+    eps, alpha, discount, layers = parse_my_args()
+    print("Configuration:")
+    print("\tEpsilon:  %f" % eps)
+    print("\tAlpha:    %f" % alpha)
+    print("\tDiscount: %f" % discount)
+    print("\tLayers:   %s" % str(layers))
+
+    sarsa_agent = get_nn_sarsa_agent(eps, alpha, discount, layers)
     random_agent = RandomAgent()
 
-    sarsa_sim = Simulation(sarsa_agent, 1)
-    random_sim = Simulation(random_agent, 1)
+    sarsa_sim = Simulation(sarsa_agent, discount)
+    random_sim = Simulation(random_agent, discount)
 
     sarsa_vals = []
     random_vals = []
@@ -37,18 +72,18 @@ if __name__ == "__main__":
     print("Simulating...")
     for i in range(1, ep_count+1):
         print("Episode %d" % i)
-        print("\tSARSA episode...")
+        print("\tSARSA episode...", end="")
+        sys.stdout.flush()
         sarsa_vals += [sarsa_sim.run_episode()]
-        print("\tDone")
-        print("\tRandom episode...")
+        print(" Done. Reward: %d" % sarsa_vals[-1])
+        print("\tRandom episode...", end="")
+        sys.stdout.flush()
         random_vals += [random_sim.run_episode()]
-        print("\tDone")
+        print(" Done. Reward: %d" % random_vals[-1])
         print()
 
     print("Average SARSA reward: %.5f ± %.2f" % (np.mean(sarsa_vals), np.std(sarsa_vals, ddof=1)))
     print("Average Random reward: %.5f ± %.2f" % (np.mean(random_vals), np.std(random_vals, ddof=1)))
-    print(sarsa_vals)
-    print(random_vals)
     print()
     print("Plots:")
 
