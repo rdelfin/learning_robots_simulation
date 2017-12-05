@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import argparse
 
@@ -8,11 +9,9 @@ from agents.function_estimator import NeuralNetEstimator
 from agents.sarsa_agent import SarsaAgent
 from agents.random_agent import RandomAgent
 from firebase_scripts import travel_data
-
-import matplotlib.pyplot as plt
 import numpy as np
 
-ep_count = 1000
+ep_count = 200
 
 def get_nn_sarsa_agent(eps, alpha, gamma, layers):
     sample_state = simulator.get_initial_state(travel_data.get_locations())
@@ -45,12 +44,14 @@ def parse_my_args():
 
     return (eps, alpha, discount, layers)
 
+# Main Code:
+#eps, alpha, discount, layers = parse_my_args()
 if __name__ == "__main__":
-    #eps, alpha, discount, layers = parse_my_args()
     eps = float(input("Epsilon: "))
     alpha = float(input("Alpha: "))
     discount = float(input("Discount: "))
     layers = [int(x) for x in input("Layers: ").split()]
+    print()
     print("Configuration:")
     print("\tEpsilon:  %f" % eps)
     print("\tAlpha:    %f" % alpha)
@@ -85,16 +86,20 @@ if __name__ == "__main__":
         random_vals += [random_sim.run_episode()]
         print(" Done. Reward: %d" % random_vals[-1])
         print()
-
+    
     print("Average SARSA reward: %.5f ± %.2f" % (np.mean(sarsa_vals), np.std(sarsa_vals, ddof=1)))
     print("Average Random reward: %.5f ± %.2f" % (np.mean(random_vals), np.std(random_vals, ddof=1)))
     print()
-    print("Plots:")
+    print("SARSA points: %s" % str(sarsa_vals))
+    print("Random points: %s" % str(random_vals))
+    print()
+    #print()
+    #print("Plots:")
 
-    f, axarr = plt.subplots(1, 2)
-    axarr[0].plot(range(ep_count), sarsa_vals)
-    axarr[0].set_title('SARSA Agent')
-    axarr[1].plot(range(ep_count), random_vals)
-    axarr[1].set_title('Random Agent')
+    #f, axarr = plt.subplots(1, 2)
+    #axarr[0].plot(range(ep_count), sarsa_vals)
+    #axarr[0].set_title('SARSA Agent')
+    #axarr[1].plot(range(ep_count), random_vals)
+    #axarr[1].set_title('Random Agent')
 
-    plt.show()
+    #plt.show()
