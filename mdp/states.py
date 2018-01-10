@@ -70,6 +70,20 @@ def state_action_reducer(state, action):
 
     return np.mat(vec_input)
 
+def state_action_reduced_range():
+    travel_locations = travel_data.get_location_ids()
+    num_actions = len(travel_locations)
+    days_in_week = 7
+
+    ranges = []
+
+    # Range for time
+    ranges += [(0, 86400)]
+     # Actions and day of week take on values from 0 to 1
+    ranges += [(0.0, 1.0) for x in range(num_actions + days_in_week)]
+
+    return ranges
+
 
 
 def probability_interval(interval, start_time, end_time, stddev, arrival):
