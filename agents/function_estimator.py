@@ -41,7 +41,7 @@ class NeuralNetEstimator(FunctionEstimator):
         return self.nn.get_weights()
 
 class FourierEstimator(FunctionEstimator):
-    def __init__(self, num_series, sample_state, sample_action):
+    def __init__(self, sample_state, sample_action, num_series):
         sample_input = state_action_reducer(sample_state, sample_action)
 
         # Each range has double the length, so that we can represent the function using
