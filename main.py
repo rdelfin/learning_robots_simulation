@@ -5,7 +5,7 @@ import argparse
 import simulator
 from simulator import Simulation
 from mdp.states import FullState, Action
-from agents.function_estimator import NeuralNetEstimator
+from agents.function_estimator import NeuralNetEstimator, FourierEstimator
 from agents.sarsa_agent import SarsaAgent
 from agents.random_agent import RandomAgent
 from firebase_scripts import travel_data
@@ -19,19 +19,27 @@ def get_nn_sarsa_agent(eps, alpha, gamma, layers):
     estimator = NeuralNetEstimator(sample_state, sample_action, layers)
     return SarsaAgent(eps, alpha, gamma, estimator)
 
+def get_fourier_sarsa_agent(eps, alpha, gamma, series):
+    sample_state = simulator.get_initial_state(travel_data.get_locations())
+    sample_action = Action(True, '77d0b6d7-2a69-4d81-9e29-1bac4e5f5c94')
+    estimator = FourierEstimator(sample_state, sample_action, series)
+    return SarsaAgent(eps, alpha, gamma, estimator)
+
 def parse_my_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--epsilon",  type=float, help="Epsilon for epsilon-greedy algorithm")
     parser.add_argument("-a", "--alpha",    type=float, help="Learning rate for approximate SARSA algorithm")
     parser.add_argument("-d", "--discount", type=float, help="Discount factor for the MDP")
-    parser.add_argument("-l", "--layers",    type=int,nargs='+', help="Number of neurons at each layer of the neural network")
+    #parser.add_argument("-l", "--layers",    type=int,nargs='+', help="Number of neurons at each layer of the neural network")
+    parser.add_argument("-s", "--series", type=int, help="The number of Fourier series to use.")
 
     args = parser.parse_args()
 
     eps = 0.1
     alpha = 0.5
     discount = 1.0
-    layers = [20, 10]
+    #layers = [20, 10]
+    series = 30
 
     if args.epsilon:
         eps = args.epsilon
@@ -39,26 +47,33 @@ def parse_my_args():
         alpha = args.alpha
     if args.discount:
         discount = args.discount
-    if args.layers:
-        layers = args.layers
+    if args.series:
+        series = args.series
+    #if args.layers:
+    #    layers = args.layers
 
-    return (eps, alpha, discount, layers)
+    #return (eps, alpha, discount, layers)
+    return (eps, alpha, discount, series)
 
 # Main Code:
 #eps, alpha, discount, layers = parse_my_args()
 if __name__ == "__main__":
+    #eps, alpha, discount, series = parse_my_args()
+    #eps, alpha, discount, layers = parse_my_args()
     eps = float(input("Epsilon: "))
     alpha = float(input("Alpha: "))
     discount = float(input("Discount: "))
-    layers = [int(x) for x in input("Layers: ").split()]
+    series = int(input("Series: "))
+    #layers = [int(x) for x in input("Layers: ").split()]
     print()
     print("Configuration:")
     print("\tEpsilon:  %f" % eps)
     print("\tAlpha:    %f" % alpha)
     print("\tDiscount: %f" % discount)
-    print("\tLayers:   %s" % str(layers))
+    print("\tSeries:   %d" % series)
+    #print("\tLayers:   %s" % str(layers))
 
-    sarsa_agent = get_nn_sarsa_agent(eps, alpha, discount, layers)
+    sarsa_agent = get_fourier_sarsa_agent(eps, alpha, discount, series)
     random_agent = RandomAgent()
 
     sarsa_sim = Simulation(sarsa_agent, discount)
@@ -72,7 +87,7 @@ if __name__ == "__main__":
     print("====================================")
 
     print()
-    print("SARSA agent with NN vs Random Action agent")
+    print("SARSA agent with Fourier series vs Random Action agent")
     print()
     print("Simulating...")
     for i in range(1, ep_count+1):
