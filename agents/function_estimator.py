@@ -82,7 +82,7 @@ class FourierEstimator(FunctionEstimator):
             x = input_form[0, d] - self.input_ranges[d][0]
 
             for s in range(self.series):
-                val += self.get_weight(d, s) * np.cos(2 * np.pi * x / period)
+                val += self.get_weight(d, s) * np.cos(2 * np.pi * s * x / period)
         
         return val
 
@@ -90,7 +90,7 @@ class FourierEstimator(FunctionEstimator):
     def get_grad(self, state, action):
         input_form = state_action_reducer(state, action)
 
-        grad = 0
+        grad = np.zeros_like(self.weights)
 
         for d in range(self.dims):
             # Each feature is f_i(x) = cos(2*x*pi*v / T\pi)
@@ -101,7 +101,7 @@ class FourierEstimator(FunctionEstimator):
 
             for s in range(self.series):
 
-                grad += np.cos(2 * np.pi * x / period)
+                grad[s + d*self.series] = np.cos(2 * np.pi * s * x / period)
         return grad
 
     def set_weights(self, weights):
