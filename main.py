@@ -40,7 +40,7 @@ def parse_my_args():
     alpha = 0.5
     discount = 1.0
     #layers = [20, 10]
-    series = 10
+    series = 1000
 
     if args.epsilon:
         eps = args.epsilon
@@ -48,10 +48,13 @@ def parse_my_args():
         alpha = args.alpha
     if args.discount:
         discount = args.discount
-    if args.layers:
+    if args.series:
         series = args.series
+    #if args.layers:
+    #    layers = args.layers
 
-    return (eps, alpha, discount, layers)
+    #return (eps, alpha, discount, layers)
+    return (eps, alpha, discount, series)
 
 if __name__ == "__main__":
     eps, alpha, discount, series = parse_my_args()
@@ -80,7 +83,7 @@ if __name__ == "__main__":
     print("====================================")
 
     print()
-    print("SARSA agent with NN vs Random Action agent")
+    print("SARSA agent with Fourier series vs Random Action agent")
     print()
     print("Simulating...")
     for i in range(1, ep_count+1):
