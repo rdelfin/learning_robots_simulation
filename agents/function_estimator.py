@@ -47,13 +47,19 @@ class FourierEstimator(FunctionEstimator):
         # Each range has double the length, so that we can represent the function using
         # only cosine features.
         self.input_ranges = [(x[0], 2*x[1] - x[0]) for x in state_action_reduced_range()]
-
-        # Only cos(x) features are used, with periods 2*range*n on each dimension
-        num_weights = sample_input.shape[1] * num_series
-        self.weights = [0 for x in range(num_weights)]
-
+        
         self.dims = sample_input.shape[1]
         self.series = num_series
+
+        self.reset_weights()
+    
+    def reset_weights(self):
+        # Only cos(x) features are used, with periods 2*range*n on each dimension
+        num_weights = self.series * self.dims
+        self.weights = np.array([])
+        for i in range(num_weights):
+            self.weights = np.append(self.weights,
+                                     np.random.normal(scale=0.1))
 
     def get_weight(self, d, s):
         # Weight index in dimension-major order
@@ -73,27 +79,30 @@ class FourierEstimator(FunctionEstimator):
             # Period is length of corresponding self.input_ranges
             period = self.input_ranges[d][1] - self.input_ranges[d][0]
             # Shift range down from [start, start + len] to [0, len]
-            x = input_form[d] - self.input_ranges[d][0]
+            x = input_form[0, d] - self.input_ranges[d][0]
 
             for s in range(self.series):
                 val += self.get_weight(d, s) * np.cos(2 * np.pi * x / period)
+        
+        return val
 
 
     def get_grad(self, state, action):
         input_form = state_action_reducer(state, action)
 
-        val = 0
+        grad = 0
 
         for d in range(self.dims):
             # Each feature is f_i(x) = cos(2*x*pi*v / T\pi)
             # Period is length of corresponding self.input_ranges
             period = self.input_ranges[d][1] - self.input_ranges[d][0]
             # Shift range down from [start, start + len] to [0, len]
-            x = input_form[d] - self.input_ranges[d][0]
+            x = input_form[0, d] - self.input_ranges[d][0]
 
             for s in range(self.series):
 
-                val += np.cos(2 * np.pi * x / period)
+                grad += np.cos(2 * np.pi * x / period)
+        return grad
 
     def set_weights(self, weights):
         if type(weights == np.ndarray):
