@@ -40,7 +40,7 @@ def parse_my_args():
     alpha = 0.5
     discount = 1.0
     #layers = [20, 10]
-    series = 1000
+    series = 30
 
     if args.epsilon:
         eps = args.epsilon
