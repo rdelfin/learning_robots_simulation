@@ -102,8 +102,8 @@ if __name__ == "__main__":
         print(" Done. Reward: %d" % random_vals[-1])
         print()
     
-    print("Average SARSA reward: %.5f ± %.2f" % (np.mean(sarsa_vals), np.std(sarsa_vals, ddof=1)))
-    print("Average Random reward: %.5f ± %.2f" % (np.mean(random_vals), np.std(random_vals, ddof=1)))
+    print("Average SARSA reward: %.5f +- %.2f" % (np.mean(sarsa_vals), np.std(sarsa_vals, ddof=1)))
+    print("Average Random reward: %.5f +- %.2f" % (np.mean(random_vals), np.std(random_vals, ddof=1)))
     print()
     print("SARSA points: %s" % str(sarsa_vals))
     print("Random points: %s" % str(random_vals))
