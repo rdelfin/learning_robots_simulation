@@ -57,17 +57,19 @@ def parse_my_args():
     return (eps, alpha, discount, series)
 
 if __name__ == "__main__":
-    eps, alpha, discount, series = parse_my_args()
+    #eps, alpha, discount, series = parse_my_args()
     #eps, alpha, discount, layers = parse_my_args()
-    #eps = float(input("Epsilon: "))
-    #alpha = float(input("Alpha: "))
-    #discount = float(input("Discount: "))
+    eps = float(input("Epsilon: "))
+    alpha = float(input("Alpha: "))
+    discount = float(input("Discount: "))
+    series = int(input("Series: "))
     #layers = [int(x) for x in input("Layers: ").split()]
     print("Configuration:")
     print("\tEpsilon:  %f" % eps)
     print("\tAlpha:    %f" % alpha)
     print("\tDiscount: %f" % discount)
     print("\tSeries:   %d" % series)
+    #print("\tLayers:   %s" % str(layers))
 
     sarsa_agent = get_fourier_sarsa_agent(eps, alpha, discount, series)
     random_agent = RandomAgent()
